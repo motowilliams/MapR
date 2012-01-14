@@ -1,0 +1,74 @@
+﻿<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="/Scripts/jquery.signalR.min.js"></script>
+<script type="text/javascript" src="/Scripts/underscore-min.js"></script>
+<script src="/signalr/hubs"></script>
+<script type="text/javascript">
+	$(function () {
+
+		// Proxy created on the fly
+		var chat = $.connection.chat;
+		var sender;
+
+		// Declare a function on the chat hub so the server can invoke it
+		chat.addMessage = function (message) {
+			$('#messages').append('<li>' + message + '</li>');
+		};
+
+		// Declare a function on the chat hub so the server can invoke it
+		chat.centerMap = function (lat, lng, zoomLevel) {
+			if (sender != true) {
+				var center = new window.google.maps.LatLng(lat, lng);
+				removeListeners();
+				map.panTo(center);
+				map.setZoom(zoomLevel);
+				addListeners();
+			} else {
+				console.log("THIS SHOULD ONLY BE LOGGED ON CONTROL MACHINE");
+			}
+			sender = null;
+		};
+
+		// Start the connection
+		$.connection.hub.start();
+
+		var myLatlng = new window.google.maps.LatLng(46.76384, -114.09480);
+		var myOptions = { zoom: 12, center: myLatlng, mapTypeId: window.google.maps.MapTypeId.ROADMAP };
+
+		var map = new window.google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+		var throttledMapCenter = _.throttle(function () {
+			var center = map.getCenter();
+			var zoomLevel = map.getZoom();
+			chat.sendCenterMap(center.lat(), center.lng(), zoomLevel);
+		}, 100);
+
+		var zoomListener;
+		var centerListener;
+
+		var removeListeners = function () {
+			console.log('remove listener');
+			window.google.maps.event.removeListener(zoomListener);
+			window.google.maps.event.removeListener(centerListener);
+		};
+
+		var addListeners = function () {
+			console.log('add listener');
+			zoomListener = window.google.maps.event.addListener(map, 'zoom_changed', function () {
+				console.log("zoom");
+				sender = true;
+				throttledMapCenter();
+			});
+
+			centerListener = window.google.maps.event.addListener(map, 'center_changed', function () {
+				console.log("center");
+				sender = true;
+				throttledMapCenter();
+			});
+		};
+
+		addListeners();
+
+	});
+</script>
+<div id="map_canvas" style="width: 560px; height: 560px;">
+</div>
