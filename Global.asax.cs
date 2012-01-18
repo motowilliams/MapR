@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 using System.Web.Routing;
+using SignalR.Routing;
 
 namespace MapR
 {

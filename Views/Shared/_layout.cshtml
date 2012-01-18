@@ -76,7 +76,8 @@
 		<div class="container">
 		  <a class="brand" href="#">MapR</a>
 		  <ul class="nav">
-			@*<li class="active">@Html.ActionLink("Home", "Index", "Home")</li>*@
+			<li class="active">@Html.ActionLink("Home", "Index", "Home")</li>
+			<li class="active">@Html.ActionLink("Chat", "Chat", "Home")</li>
 		  </ul>
 		  <form action="" class="pull-right">
 @*			<input class="input-small" type="text" placeholder="Username">
@@ -97,9 +98,10 @@
 			<div class="span10">
 				@RenderBody()
 			</div>
-		  <div class="span4">
-			<h3>Open a couple of browsers and move the map on one of them</h3>
-		  </div>
+			<div class="span4">
+				<h3 id="userCount"></h3>
+				<div id="userList"></div>
+			</div>
 		</div>
 	  </div>
 
