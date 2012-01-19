@@ -58,9 +58,7 @@
 							});
 
 						window.google.maps.event.addListener(smallMap, 'bounds_changed', function () {
-							var ne = smallMap.getBounds().getNorthEast();
-							var sw = smallMap.getBounds().getSouthWest();
-							maprhub.boundsChanged(ne, sw);
+							throttledBoundsChange();
 						});
 					});
 				});
@@ -68,6 +66,12 @@
 		// next function is the error callback
 			function (error) { });
 	};
+
+	var throttledBoundsChange = _.throttle(function () {
+		var ne = smallMap.getBounds().getNorthEast();
+		var sw = smallMap.getBounds().getSouthWest();
+		maprhub.boundsChanged(ne, sw);
+	}, 250);
 
 	var userTemplate = _.template('<div id="<%= ClientId %>" style="-moz-border-radius: 7px;border-radius: 7px;padding:3px;margin-bottom:2px;margin-top:2px;border-style:solid;border-width:2px;background-color:#f0f0f0;border-color:<%= Color %>;"><%= Name %><br/><%= ClientId %></div>');
 
@@ -202,29 +206,5 @@
 	maprhub.debug = function (data) {
 		console.log(data);
 	};
-
-	// limit a function to only firing once every XX ms
-	var throttle = function (fn, delay) {
-		var last = 0, timeout, args, context;
-		delay || (delay = 100);
-		return function () {
-			// we subtract the delay to prevent double executions
-			var now = +new Date, elapsed = (now - last - delay);
-			args = arguments, context = this;
-
-			function exec() {
-				// remove any existing delayed execution
-				timeout && (timeout = clearTimeout(timeout));
-				fn.apply(context, args);
-				last = now;
-			}
-
-			// execute the function now
-			if (elapsed > delay) exec();
-			// add delayed execution (this could execute a few ms later than the delay)
-			else if (!timeout) timeout = setTimeout(exec, delay);
-		};
-	};
-
-
+	
 });
