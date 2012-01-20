@@ -33,13 +33,12 @@ namespace MapR
 			return new Response { Foo = string.Format("{0},{1}", northEast, southWest) };
 		}
 
-		public MapRClient[] Join(LatLng northEast, LatLng southWest)
+		public void Join(LatLng northEast, LatLng southWest)
 		{
 			var mapRClient = new MapRClient { ClientId = Context.ClientId, Color = RandomColor(), Name = "User", NorthEast = northEast, SouthWest = southWest };
 			System.Diagnostics.Debug.WriteLine("Adding " + mapRClient);
 			_maprClients.Add(mapRClient.ClientId, mapRClient);
 			Clients.joinResult(_maprClients);
-			return _maprClients.Select(x => x.Value).ToArray();
 		}
 
 		public void BoundsChanged(LatLng northEast, LatLng southWest)
